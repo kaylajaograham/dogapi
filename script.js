@@ -1,42 +1,36 @@
-// api key and search endpoint
+'use strict';
 
-const randomUrl = "https://dog.ceo/api/breeds/image/random/";
-
-
-function displayResults(responseJson) {
-    console.log(responseJson);
-    $(".results-img").empty();
-
-    for (let i = 0; i < responseJson.message.length; i++)
-        $(".results-img").append(
-            `<li><img src="${responseJson.message[i]}" class="results-img"></li>`
-        )
-        //display the results section
-    $('#results').removeClass('hidden');
-}
-
-function getImages(imgNum) {
-    let newUrl = randomUrl + imgNum;
-
-    fetch(newUrl)
+function getDogImage() {
+    let name = $('input:text').val();
+    console.log(name);
+    fetch('https://dog.ceo/api/breed/' + name + '/images/random')
         .then(response => response.json())
         .then(responseJson =>
             displayResults(responseJson))
-        .catch(error => alert('Something went wrong. Try again later.'));
+        .catch(error => alert('Something went wrong. Try a new breed.'));
 }
 
-
-// watch the form submit button
+function displayResults(responseJson) {
+    console.log(responseJson);
+    let status = responseJson.status;
+    if (status == 'error') {
+        alert('Something went wrong. Try a new breed.')
+    } else {
+        $('.results-img').replaceWith(
+            `<img src="${responseJson.message}" class="results-img">`)
+    }
+    //display the results section
+    $('.results').removeClass('hidden');
+}
 
 function watchForm() {
-    $("form").submit(event => {
+    $('form').submit(event => {
         event.preventDefault();
-        const imgNum = $("#max-results").val();
-        getImages(imgNum);
-    })
-
+        getDogImage();
+    });
 }
 
-
-
-$(watchForm);
+$(function() {
+    console.log('App loaded! Waiting for submit!');
+    watchForm();
+});
